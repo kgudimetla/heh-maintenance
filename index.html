@@ -8,16 +8,17 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
         .sheet-table { border-collapse: collapse; width: 100%; background: white; }
-        .sheet-table th, .sheet-table td { border: 1px solid #e0e0e0; padding: 8px 12px; text-align: left; font-size: 14px; }
-        .sheet-table th { background-color: #f1f3f4; font-weight: 600; color: #5f6368; }
+        .sheet-table th, .sheet-table td { border: 1px solid #e0e0e0; padding: 10px 12px; text-align: left; font-size: 14px; }
+        .sheet-table th { background-color: #f1f3f4; font-weight: 600; color: #5f6368; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
         .header-cell { background-color: #ffffff; font-weight: bold; text-align: center; font-size: 18px; padding: 20px; border-bottom: 3px solid #1a73e8 !important; }
-        .sub-header { background-color: #f8fafc; font-weight: bold; color: #475569; border-left: 4px solid #1a73e8; }
-        .amount-cell { text-align: right; font-family: 'Courier New', Courier, monospace; font-weight: 500; }
-        .tag-fixed { background-color: #e6fffa; color: #2c7a7b; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; border: 1px solid #b2f5ea; }
-        .tag-uds { background-color: #fffaf0; color: #9c4221; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; border: 1px solid #feebc8; }
+        .section-header { background-color: #f8fafc; font-weight: 800; color: #1e293b; border-left: 4px solid #1a73e8; font-size: 15px; }
+        .amount-cell { text-align: right; font-family: 'Courier New', Courier, monospace; font-weight: 600; }
+        .tag-fixed { background-color: #e6fffa; color: #2c7a7b; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; border: 1px solid #b2f5ea; }
+        .tag-uds { background-color: #fffaf0; color: #9c4221; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; border: 1px solid #feebc8; }
+        .tag-prorated { background-color: #ebf4ff; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; border: 1px solid #bfdbfe; text-transform: uppercase; }
         .summary-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .comparison-row { transition: all 0.2s; }
-        .comparison-row:hover { background-color: #f1f5f9; }
+        .comparison-row { transition: all 0.2s; border-bottom: 1px solid #f1f5f9; }
+        .comparison-row:hover { background-color: #f8fafc; }
     </style>
 </head>
 <body class="p-4 md:p-8 bg-slate-50">
@@ -33,12 +34,12 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold text-gray-800">Habitat Eden Heights - Comparative Billing Tool</h1>
-                    <p class="text-xs text-gray-500">Official Maintenance Comparison: SFT vs. Flat vs. Hybrid Models</p>
+                    <p class="text-xs text-gray-500">Proposed Hybrid Maintenance Model: Analysis of Shared vs. Area-Based Costs</p>
                 </div>
             </div>
             <div class="flex space-x-2">
                 <button onclick="copyAppUrl()" class="bg-white text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 transition flex items-center gap-2 border border-gray-300">
-                    Copy Page Link
+                    Copy Link
                 </button>
                 <button onclick="window.print()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 transition flex items-center gap-2 border border-gray-300">
                     Export PDF
@@ -53,131 +54,133 @@
                     <table class="sheet-table" id="budget-table">
                         <thead>
                             <tr>
-                                <th colspan="5" class="header-cell">Consolidated Expense Ledger (Monthly Normalized)</th>
+                                <th colspan="4" class="header-cell">Consolidated Expense Ledger (Monthly)</th>
                             </tr>
                             <tr>
-                                <th class="w-12">#</th>
                                 <th>Particulars</th>
                                 <th class="w-32">Monthly (₹)</th>
-                                <th class="w-24">Hybrid Logic</th>
-                                <th>Reasoning</th>
+                                <th class="w-24 text-center">Type</th>
+                                <th>Logic & Reasoning</th>
                             </tr>
                         </thead>
                         <tbody id="ledger-body">
-                            <!-- Populated by JS -->
+                            <!-- Section A -->
+                            <tr>
+                                <td colspan="4" class="section-header py-3 px-4 flex items-center gap-2">
+                                    SECTION A: Fixed Shared Expenses 
+                                    <span class="text-[10px] font-normal text-slate-400 normal-case">(Divided Equally per Flat)</span>
+                                </td>
+                            </tr>
+                            <!-- Section B -->
+                            <tr id="section-b-marker">
+                                <td colspan="4" class="section-header py-3 px-4 flex items-center gap-2">
+                                    SECTION B: UDS/Area-Based Expenses
+                                    <span class="text-[10px] font-normal text-slate-400 normal-case">(Calculated by Sft)</span>
+                                </td>
+                            </tr>
                         </tbody>
                         <tfoot class="bg-slate-100">
                             <tr class="bg-slate-800 text-white font-bold">
-                                <td colspan="2" class="text-right py-4 uppercase tracking-wider">Total Monthly Budget:</td>
+                                <td class="text-right py-4 uppercase tracking-wider">Total Monthly Expenditure:</td>
                                 <td class="amount-cell text-lg" id="grand-total-val">₹0</td>
-                                <td colspan="2" class="text-xs px-4 italic opacity-80">Inclusive of all Annual Maintenance Contracts (AMC)</td>
+                                <td colspan="2" class="text-xs px-4 italic opacity-80">Includes both recurring operations and annualized AMCs</td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
 
-                <!-- Comparison Insights -->
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="p-4 bg-white border border-gray-200 rounded-xl">
-                        <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Pure SFT Model</h4>
-                        <p class="text-2xl font-bold text-gray-800">₹3.10 <span class="text-sm font-normal text-gray-500">/ sft</span></p>
-                        <p class="text-[10px] text-gray-500 mt-1 italic">Billing based strictly on ownership share (UDS).</p>
-                    </div>
-                    <div class="p-4 bg-white border border-gray-200 rounded-xl border-l-4 border-l-blue-500">
-                        <h4 class="text-xs font-bold text-blue-600 uppercase mb-2">Hybrid Model (Proposed)</h4>
-                        <p class="text-2xl font-bold text-blue-800" id="hybrid-avg">₹~2,900 + SFT</p>
-                        <p class="text-[10px] text-blue-500 mt-1 italic">Services shared equally; Assets/Utilities shared by area.</p>
-                    </div>
-                    <div class="p-4 bg-white border border-gray-200 rounded-xl">
-                        <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Pure Flat Model</h4>
-                        <p class="text-2xl font-bold text-gray-800" id="flat-only-val">₹~5,310</p>
-                        <p class="text-[10px] text-gray-500 mt-1 italic">Total budget divided equally among all apartments.</p>
-                    </div>
+                <!-- Info Box for Prorating -->
+                <div class="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-[11px] text-blue-800 leading-relaxed">
+                        Items tagged as <span class="tag-prorated font-bold text-[9px]">Prorated</span> represent Annual Maintenance Contracts (AMC) or one-time annual payments. 
+                        These values are divided by 12 to show an accurate monthly budget impact and to ensure comparison consistency.
+                    </p>
                 </div>
 
-                <!-- Model Explainer -->
-                <div class="mt-6 p-6 bg-white border border-gray-200 rounded-xl">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">Understanding the Hybrid Model</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                        <div>
-                            <h3 class="font-bold text-teal-700 flex items-center gap-2 mb-2">
-                                <span class="w-2 h-2 rounded-full bg-teal-500"></span>
-                                Fixed Component (Shared Services)
-                            </h3>
-                            <p class="text-gray-600">Services that provide identical value to every doorstep regardless of size: Security, Housekeeping personnel, Garbage collection, and Management technology (MyGate).</p>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-orange-700 flex items-center gap-2 mb-2">
-                                <span class="w-2 h-2 rounded-full bg-orange-500"></span>
-                                UDS Component (Asset Ownership)
-                            </h3>
-                            <p class="text-gray-600">Costs related to building capital, common utilities, and legal compliance: Lift AMC, Insurance, DG maintenance, STP/WTP operations, and BESCOM common area charges.</p>
-                        </div>
+                <!-- Model Comparison Cards -->
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-white border border-gray-200 rounded-xl">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Scenario: 100% SFT</h4>
+                        <p class="text-2xl font-bold text-gray-800">₹3.10 <span class="text-sm font-normal text-gray-500">/ sft</span></p>
+                    </div>
+                    <div class="p-4 bg-white border-2 border-blue-500 rounded-xl shadow-lg relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] px-2 py-1 font-bold rounded-bl-lg">PROPOSED</div>
+                        <h4 class="text-xs font-bold text-blue-600 uppercase mb-2">Scenario: Hybrid</h4>
+                        <p class="text-2xl font-bold text-blue-800" id="hybrid-avg">₹0</p>
+                    </div>
+                    <div class="p-4 bg-white border border-gray-200 rounded-xl">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Scenario: 100% Flat</h4>
+                        <p class="text-2xl font-bold text-gray-800" id="flat-only-val">₹0</p>
                     </div>
                 </div>
             </div>
 
             <!-- Dashboard / Calculator -->
             <div class="lg:col-span-1 space-y-6">
-                <!-- Integrated Calculator -->
+                <!-- Calculator -->
                 <div class="summary-card p-6 border-2 border-blue-100 bg-white sticky top-4">
-                    <h3 class="text-sm font-bold text-blue-800 uppercase tracking-wider mb-4">Resident Calculation</h3>
-                    <div class="space-y-3">
+                    <h3 class="text-sm font-bold text-blue-800 uppercase tracking-wider mb-4 text-center">Cost Calculator</h3>
+                    <div class="space-y-4">
                         <div>
-                            <label class="text-xs text-blue-600 font-bold">Your Flat Area (Sft)</label>
-                            <input type="number" id="my-sft" value="1500" oninput="calculateBill()" class="w-full p-2 border border-blue-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="text-[11px] text-gray-500 font-bold uppercase">Your Flat Area (Sft)</label>
+                            <input type="number" id="my-sft" value="1500" oninput="calculateBill()" class="w-full p-2 mt-1 border border-blue-200 rounded-lg text-sm font-mono outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
-                            <label class="text-xs text-blue-600 font-bold">Total Society Flats</label>
-                            <input type="number" id="flat-count" value="300" oninput="calculateBill()" class="w-full p-2 border border-blue-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="text-[11px] text-gray-500 font-bold uppercase">Total Society Flats</label>
+                            <input type="number" id="flat-count" value="300" oninput="calculateBill()" class="w-full p-2 mt-1 border border-blue-200 rounded-lg text-sm font-mono outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         
-                        <div class="mt-6 space-y-4 pt-4 border-t border-gray-100">
-                            <!-- Scenario 1 -->
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-500">Pure SFT (100%):</span>
-                                <span class="text-sm font-mono font-bold text-gray-700" id="calc-sft">₹0</span>
+                        <div class="pt-4 border-t border-gray-100 space-y-3">
+                            <div class="flex justify-between items-center text-gray-500">
+                                <span class="text-xs italic">Pure SFT:</span>
+                                <span class="text-sm font-mono" id="calc-sft">₹0</span>
                             </div>
-                            <!-- Scenario 2 -->
-                            <div class="flex justify-between items-center p-3 bg-blue-600 rounded-lg shadow-md">
-                                <span class="text-xs font-bold text-white">Proposed Hybrid:</span>
-                                <span class="text-base font-mono font-black text-white" id="calc-hybrid">₹0</span>
+                            <div class="flex flex-col p-3 bg-blue-600 rounded-lg shadow-inner">
+                                <div class="flex justify-between items-center text-white mb-1">
+                                    <span class="text-xs font-bold uppercase">Hybrid Total:</span>
+                                    <span class="text-lg font-mono font-black" id="calc-hybrid">₹0</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] text-blue-100">
+                                    <span>Fixed: <span id="calc-hybrid-fixed">₹0</span></span>
+                                    <span>Variable: <span id="calc-hybrid-uds">₹0</span></span>
+                                </div>
                             </div>
-                            <!-- Scenario 3 -->
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-500">Pure Flat (100%):</span>
-                                <span class="text-sm font-mono font-bold text-gray-700" id="calc-flat">₹0</span>
+                            <div class="flex justify-between items-center text-gray-500">
+                                <span class="text-xs italic">Pure Flat:</span>
+                                <span class="text-sm font-mono" id="calc-flat">₹0</span>
                             </div>
                         </div>
 
-                        <div class="mt-4 p-3 bg-slate-50 rounded-lg">
-                            <p class="text-[11px] text-gray-600 text-center leading-tight">
-                                <span class="font-bold">Difference:</span> Your bill changes by 
-                                <span id="delta-text" class="font-bold">₹0</span> 
-                                vs. standard SFT billing.
+                        <div id="delta-box" class="mt-4 p-3 rounded-lg text-center">
+                            <p class="text-[11px] leading-tight font-medium">
+                                Hybrid is <span id="delta-text">₹0</span> 
+                                <span id="delta-direction">vs. SFT billing</span>.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Split Chart -->
+                <!-- Analysis Split -->
                 <div class="summary-card p-6 border border-gray-200">
-                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Hybrid Cost Split</h3>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Budget Split</h3>
                     <div class="space-y-4">
                         <div class="flex justify-between items-end">
-                            <span class="text-xs text-gray-600">Fixed (Shared):</span>
-                            <span class="text-sm font-mono font-bold text-teal-700" id="fixed-total">₹0</span>
+                            <span class="text-[11px] font-bold text-teal-700">Section A (Fixed)</span>
+                            <span class="text-sm font-mono font-bold" id="fixed-total">₹0</span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-1.5">
-                            <div id="fixed-bar" class="bg-teal-500 h-1.5 rounded-full" style="width: 0%"></div>
+                        <div class="w-full bg-gray-100 rounded-full h-2">
+                            <div id="fixed-bar" class="bg-teal-500 h-2 rounded-full" style="width: 0%"></div>
                         </div>
                         
                         <div class="flex justify-between items-end mt-4">
-                            <span class="text-xs text-gray-600">UDS (Area-Based):</span>
-                            <span class="text-sm font-mono font-bold text-orange-700" id="uds-total">₹0</span>
+                            <span class="text-[11px] font-bold text-orange-700">Section B (UDS)</span>
+                            <span class="text-sm font-mono font-bold" id="uds-total">₹0</span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-1.5">
-                            <div id="uds-bar" class="bg-orange-500 h-1.5 rounded-full" style="width: 0%"></div>
+                        <div class="w-full bg-gray-100 rounded-full h-2">
+                            <div id="uds-bar" class="bg-orange-500 h-2 rounded-full" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
@@ -185,56 +188,65 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full text-sm font-bold shadow-2xl hidden z-[60]">Link copied to clipboard!</div>
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full text-sm font-bold shadow-2xl hidden z-[60]">Link copied!</div>
 
     <script>
         const TOTAL_PROJECT_AREA = 514443;
 
         const recurringData = [
-            { vendor: "Paradigm (Security/HK)", amount: 773000, type: "Fixed", logic: "Doorstep/Personnel based" },
-            { vendor: "Kavi Garden", amount: 50000, type: "Fixed", logic: "Shared aesthetic value" },
-            { vendor: "Bio-Ren (WTP)", amount: 151630, type: "UDS", logic: "Usage proxy (area-based)" },
-            { vendor: "Sri Venkateshwara (Garbage)", amount: 20000, type: "Fixed", logic: "Per flat pickup" },
-            { vendor: "Peniel Pest Control", amount: 22000, type: "Fixed", logic: "Shared coverage" },
-            { vendor: "BESCOM (Common)", amount: 260000, type: "UDS", logic: "Asset ownership %" },
-            { vendor: "STP Maintenance", amount: 110920, type: "UDS", logic: "Load factor" },
-            { vendor: "Fire Fighting AMC", amount: 35000, type: "UDS", logic: "Infrastructure value" },
-            { vendor: "AP Enterprises (HK Mat)", amount: 22430, type: "Fixed", logic: "Shared operations" }
+            { vendor: "Paradigm (Security/HK)", amount: 773000, type: "Fixed", prorated: false, logic: "Doorstep service / Personnel count independent of size" },
+            { vendor: "Kavi Garden", amount: 50000, type: "Fixed", prorated: false, logic: "Shared aesthetic value" },
+            { vendor: "Bio-Ren (WTP)", amount: 151630, type: "UDS", prorated: false, logic: "Water consumption proxy" },
+            { vendor: "Sri Venkateshwara (Garbage)", amount: 20000, type: "Fixed", prorated: false, logic: "Per flat collection" },
+            { vendor: "Peniel Pest Control", amount: 22000, type: "Fixed", prorated: false, logic: "Uniform coverage" },
+            { vendor: "BESCOM (Common)", amount: 260000, type: "UDS", prorated: false, logic: "Pumping / Common Load" },
+            { vendor: "STP Maintenance", amount: 110920, type: "UDS", prorated: false, logic: "Load factor" },
+            { vendor: "Fire Fighting AMC", amount: 35000, type: "UDS", prorated: false, logic: "Compliance based on area" },
+            { vendor: "AP Enterprises (HK Mat)", amount: 22430, type: "Fixed", prorated: false, logic: "Shared operations" }
         ];
 
         const nonRecurringData = [
-            { vendor: "Vivish (MyGate)", annual: 58622, type: "Fixed", logic: "Tech service per flat" },
-            { vendor: "DGTRONIX (CCTV)", annual: 29000, type: "UDS", logic: "Asset protection" },
-            { vendor: "Bharth Gruharaksha (Insurance)", annual: 354177, type: "UDS", logic: "Capital asset value" },
-            { vendor: "Johnson Lifts AMC", annual: 800000, type: "UDS", logic: "Capital asset maintenance" },
-            { vendor: "Tank/Sump Cleaning", annual: 50000, type: "UDS", logic: "Health Infrastructure" },
-            { vendor: "DG AMC", annual: 27500, type: "UDS", logic: "Capital asset maintenance" },
-            { vendor: "Sanjana Fuel (Diesel)", annual: 180000, type: "UDS", logic: "Load based" },
-            { vendor: "Electrical Inspectorate", annual: 80000, type: "UDS", logic: "Asset Compliance" },
-            { vendor: "Misc Repairs", annual: 200000, type: "UDS", logic: "Asset Upkeep" }
+            { vendor: "Vivish (MyGate)", annual: 58622, type: "Fixed", prorated: true, logic: "Tech license per unit" },
+            { vendor: "DGTRONIX (CCTV)", annual: 29000, type: "Fixed", prorated: true, logic: "Common infrastructure" },
+            { vendor: "Bharth Gruharaksha (Ins.)", annual: 354177, type: "UDS", prorated: true, logic: "Asset valuation share" },
+            { vendor: "Johnson Lifts AMC", annual: 800000, type: "Fixed", prorated: true, logic: "Vertical mobility service" },
+            { vendor: "Tank/Sump Cleaning", annual: 50000, type: "UDS", prorated: true, logic: "Storage capacity" },
+            { vendor: "DG AMC", annual: 27500, type: "UDS", prorated: true, logic: "Capital upkeep" },
+            { vendor: "Sanjana Fuel (Diesel)", annual: 180000, type: "UDS", prorated: true, logic: "Backup load requirement" },
+            { vendor: "Electrical Inspectorate", annual: 80000, type: "UDS", prorated: true, logic: "Compliance" },
+            { vendor: "Misc Repairs", annual: 200000, type: "UDS", prorated: true, logic: "Asset maintenance" }
         ];
 
         function init() {
             const body = document.getElementById('ledger-body');
-            let recTotal = 0, nonRecTotal = 0, fixedSum = 0, udsSum = 0;
+            const sectionBMarker = document.getElementById('section-b-marker');
+            
+            let fixedSum = 0;
+            let udsSum = 0;
 
-            recurringData.forEach(i => {
-                recTotal += i.amount;
-                if(i.type === "Fixed") fixedSum += i.amount; else udsSum += i.amount;
-                appendRow(body, i.vendor, i.amount, i.type, i.logic);
+            const allItems = [
+                ...recurringData.map(d => ({...d, monthly: d.amount})),
+                ...nonRecurringData.map(d => ({...d, monthly: Math.round(d.annual/12)}))
+            ];
+
+            // Filter Section A (Fixed)
+            allItems.filter(i => i.type === "Fixed").forEach(item => {
+                fixedSum += item.monthly;
+                const row = createRow(item);
+                sectionBMarker.parentNode.insertBefore(row, sectionBMarker);
             });
 
-            nonRecurringData.forEach(i => {
-                const m = Math.round(i.annual / 12);
-                nonRecTotal += m;
-                if(i.type === "Fixed") fixedSum += m; else udsSum += m;
-                appendRow(body, i.vendor + " (Annualized)", m, i.type, i.logic);
+            // Filter Section B (UDS)
+            allItems.filter(i => i.type === "UDS").forEach(item => {
+                udsSum += item.monthly;
+                body.appendChild(createRow(item));
             });
 
-            const grand = recTotal + nonRecTotal;
-            document.getElementById('grand-total-val').innerText = '₹' + Math.round(grand).toLocaleString('en-IN');
-            document.getElementById('fixed-total').innerText = '₹' + Math.round(fixedSum).toLocaleString('en-IN');
-            document.getElementById('uds-total').innerText = '₹' + Math.round(udsSum).toLocaleString('en-IN');
+            const grand = fixedSum + udsSum;
+            document.getElementById('grand-total-val').innerText = '₹' + grand.toLocaleString('en-IN');
+            document.getElementById('fixed-total').innerText = '₹' + fixedSum.toLocaleString('en-IN');
+            document.getElementById('uds-total').innerText = '₹' + udsSum.toLocaleString('en-IN');
+            
             document.getElementById('fixed-bar').style.width = ((fixedSum/grand)*100)+'%';
             document.getElementById('uds-bar').style.width = ((udsSum/grand)*100)+'%';
             
@@ -244,43 +256,58 @@
             calculateBill();
         }
 
-        function appendRow(parent, vendor, amt, type, logic) {
-            parent.innerHTML += `
-                <tr class="comparison-row">
-                    <td class="text-gray-400 text-[10px]">•</td>
-                    <td class="font-medium text-slate-700">${vendor}</td>
-                    <td class="amount-cell text-slate-900">${amt.toLocaleString('en-IN')}</td>
-                    <td><span class="${type==='Fixed'?'tag-fixed':'tag-uds'}">${type}</span></td>
-                    <td class="text-[11px] text-gray-500">${logic}</td>
-                </tr>
+        function createRow(item) {
+            const tr = document.createElement('tr');
+            tr.className = "comparison-row";
+            tr.innerHTML = `
+                <td class="font-medium text-slate-700">
+                    <div class="flex items-center gap-2">
+                        ${item.vendor}
+                        ${item.prorated ? '<span class="tag-prorated">Prorated</span>' : ''}
+                    </div>
+                </td>
+                <td class="amount-cell text-slate-900">₹${item.monthly.toLocaleString('en-IN')}</td>
+                <td class="text-center"><span class="${item.type==='Fixed'?'tag-fixed':'tag-uds'}">${item.type}</span></td>
+                <td class="text-[11px] text-gray-500 leading-tight">${item.logic}</td>
             `;
+            return tr;
         }
 
         function calculateBill() {
             const flats = parseFloat(document.getElementById('flat-count').value) || 1;
             const mySft = parseFloat(document.getElementById('my-sft').value) || 0;
             
-            const totalBudget = recurringData.reduce((a,b)=>a+b.amount,0) + nonRecurringData.reduce((a,b)=>a+b.annual,0)/12;
-            const fixedPool = recurringData.filter(i=>i.type==="Fixed").reduce((a,b)=>a+b.amount,0) + 
-                              nonRecurringData.filter(i=>i.type==="Fixed").reduce((a,b)=>a+b.annual,0)/12;
-            const udsPool = totalBudget - fixedPool;
+            const totalFixed = recurringData.filter(i=>i.type==="Fixed").reduce((a,b)=>a+b.amount,0) + 
+                               nonRecurringData.filter(i=>i.type==="Fixed").reduce((a,b)=>a+b.annual,0)/12;
+            const totalUds = recurringData.filter(i=>i.type==="UDS").reduce((a,b)=>a+b.amount,0) + 
+                             nonRecurringData.filter(i=>i.type==="UDS").reduce((a,b)=>a+b.annual,0)/12;
+            const totalBudget = totalFixed + totalUds;
 
             const pureSftBill = (totalBudget / TOTAL_PROJECT_AREA) * mySft;
             const pureFlatBill = totalBudget / flats;
-            const hybridBill = (fixedPool / flats) + ((udsPool / TOTAL_PROJECT_AREA) * mySft);
+            const hybridFixed = totalFixed / flats;
+            const hybridUds = (totalUds / TOTAL_PROJECT_AREA) * mySft;
+            const hybridTotal = hybridFixed + hybridUds;
 
             document.getElementById('calc-sft').innerText = '₹' + Math.round(pureSftBill).toLocaleString();
             document.getElementById('calc-flat').innerText = '₹' + Math.round(pureFlatBill).toLocaleString();
-            document.getElementById('calc-hybrid').innerText = '₹' + Math.round(hybridBill).toLocaleString();
+            document.getElementById('calc-hybrid').innerText = '₹' + Math.round(hybridTotal).toLocaleString();
+            document.getElementById('calc-hybrid-fixed').innerText = '₹' + Math.round(hybridFixed).toLocaleString();
+            document.getElementById('calc-hybrid-uds').innerText = '₹' + Math.round(hybridUds).toLocaleString();
 
-            const diff = Math.round(hybridBill - pureSftBill);
-            const deltaEl = document.getElementById('delta-text');
+            const diff = Math.round(hybridTotal - pureSftBill);
+            const deltaText = document.getElementById('delta-text');
+            const deltaBox = document.getElementById('delta-box');
+            const deltaDir = document.getElementById('delta-direction');
+
             if(diff >= 0) {
-                deltaEl.innerText = `+₹${diff.toLocaleString()}`;
-                deltaEl.className = "font-bold text-orange-600";
+                deltaText.innerText = `₹${diff.toLocaleString()} higher`;
+                deltaBox.className = "mt-4 p-3 rounded-lg text-center bg-orange-50 text-orange-700 border border-orange-100";
+                deltaDir.innerText = "compared to SFT billing";
             } else {
-                deltaEl.innerText = `-₹${Math.abs(diff).toLocaleString()}`;
-                deltaEl.className = "font-bold text-green-600";
+                deltaText.innerText = `₹${Math.abs(diff).toLocaleString()} lower`;
+                deltaBox.className = "mt-4 p-3 rounded-lg text-center bg-green-50 text-green-700 border border-green-100";
+                deltaDir.innerText = "saving compared to SFT billing";
             }
         }
 
