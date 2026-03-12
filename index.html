@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habitat Eden Heights AMC Sheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
+        .sheet-table { border-collapse: collapse; width: 100%; background: white; }
+        .sheet-table th, .sheet-table td { border: 1px solid #e0e0e0; padding: 8px 12px; text-align: left; font-size: 14px; }
+        .sheet-table th { background-color: #f1f3f4; font-weight: 600; color: #5f6368; }
+        .header-cell { background-color: #ffffff; font-weight: bold; text-align: center; font-size: 18px; padding: 20px; border-bottom: 3px solid #1a73e8 !important; }
+        .amount-cell { text-align: right; font-family: 'Courier New', Courier, monospace; font-weight: 500; }
+        .tag-fixed { background-color: #e6fffa; color: #2c7a7b; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; border: 1px solid #b2f5ea; }
+        .tag-uds { background-color: #fffaf0; color: #9c4221; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; border: 1px solid #feebc8; }
+        .summary-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .ai-glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); border: 1px solid rgba(59, 130, 246, 0.5); }
+    </style>
+</head>
+<body class="p-4 md:p-8 bg-slate-50">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Google Sheets Header -->
+        <div class="mb-6 flex flex-col md:flex-row items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
+            <div class="flex items-center space-x-4">
+                <div class="bg-green-600 p-2 rounded text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800">Habitat Eden Heights AMC - AI Enhanced</h1>
+                    <p class="text-xs text-gray-500">File Version: 2026.03.12 | Powered by Gemini ✨</p>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <button onclick="window.print()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 transition flex items-center gap-2 border border-gray-300">
+                    Print / Save PDF
+                </button>
+                <button onclick="openAIModal('analysis')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition flex items-center gap-2 shadow-lg shadow-blue-200">
+                    ✨ Analyze Budget
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Main Ledger Section -->
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="sheet-table">
+                        <thead>
+                            <tr>
+                                <th colspan="5" class="header-cell">Detailed Expense Classification</th>
+                            </tr>
+                            <tr>
+                                <th class="w-12">#</th>
+                                <th>Service / Vendor</th>
+                                <th class="w-32">Monthly (₹)</th>
+                                <th class="w-24">Category</th>
+                                <th>Allocation Logic</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledger-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-slate-50 font-bold">
+                                <td colspan="2" class="text-right py-4">Gross Monthly Total:</td>
+                                <td class="amount-cell text-lg" id="gross-total">₹0</td>
+                                <td colspan="2" class="text-gray-400 text-xs px-4 italic">Total recurring cost to the association</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- AI Insights Section -->
+                <div class="mt-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-xl ai-glow">
+                    <h2 class="text-lg font-bold text-blue-900 flex items-center gap-2 mb-4">
+                        ✨ AI Strategic Assistant
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button onclick="generateAIPrompt('justify_hybrid')" class="text-left p-4 bg-white hover:bg-blue-50 border border-blue-200 rounded-lg transition group">
+                            <p class="font-bold text-sm text-blue-800">✨ Draft Hybrid Model Justification</p>
+                            <p class="text-xs text-gray-500 mt-1">Generate a polite letter for residents explaining the mixed billing logic.</p>
+                        </button>
+                        <button onclick="generateAIPrompt('efficiency_tips')" class="text-left p-4 bg-white hover:bg-blue-50 border border-blue-200 rounded-lg transition group">
+                            <p class="font-bold text-sm text-blue-800">✨ Cost Saving Opportunities</p>
+                            <p class="text-xs text-gray-500 mt-1">AI analysis of current vendors to suggest efficiency improvements.</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard / Calculator Section -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Hybrid Summary -->
+                <div class="summary-card p-6 border border-gray-200">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Hybrid Split</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-end">
+                            <span class="text-sm text-gray-600">Fixed (Equal):</span>
+                            <span class="text-lg font-mono font-bold text-teal-700" id="fixed-total">₹0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="fixed-bar" class="bg-teal-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="flex justify-between items-end mt-6">
+                            <span class="text-sm text-gray-600">UDS (Area):</span>
+                            <span class="text-lg font-mono font-bold text-orange-700" id="uds-total">₹0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="uds-bar" class="bg-orange-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Calculator -->
+                <div class="summary-card p-6 border-2 border-blue-100 bg-blue-50/30">
+                    <h3 class="text-sm font-bold text-blue-800 uppercase tracking-wider mb-4">Resident Calculator</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-blue-600 font-bold">Occupied Units (Flats)</label>
+                            <input type="number" id="flat-count" value="300" class="w-full p-2 border border-blue-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs text-blue-600 font-bold">Your Flat Area (Sft)</label>
+                            <input type="number" id="my-sft" value="1500" class="w-full p-2 border border-blue-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                        </div>
+                        <button onclick="calculateBill()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition">
+                            Calculate My Bill
+                        </button>
+                        
+                        <div id="result-display" class="hidden mt-4 pt-4 border-t border-blue-200">
+                            <p class="text-xs text-blue-500 font-medium">Monthly Maintenance Due:</p>
+                            <div class="flex items-baseline space-x-1">
+                                <span class="text-3xl font-black text-blue-900" id="final-amount">₹0</span>
+                                <span class="text-xs text-blue-400">/ month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Output Modal -->
+    <div id="aiModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-blue-600 text-white">
+                <h3 class="font-bold text-lg flex items-center gap-2">✨ Gemini AI Assistant</h3>
+                <button onclick="closeAIModal()" class="text-white hover:opacity-75">✕</button>
+            </div>
+            <div id="aiContent" class="p-8 overflow-y-auto text-gray-700 leading-relaxed whitespace-pre-wrap">
+                Processing your data...
+            </div>
+            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+                <button onclick="closeAIModal()" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-bold text-sm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = ""; // Environment provided
+        const amcData = [
+            { id: 1, vendor: "Paradigm (Security/HK)", amount: 773000, type: "Fixed", logic: "Security & Management are equal services per unit." },
+            { id: 2, vendor: "Kavi Garden", amount: 50000, type: "Fixed", logic: "Common area aesthetics enjoyed equally by all." },
+            { id: 3, vendor: "Bio-Ren (WTP)", amount: 151630, type: "UDS", logic: "Water treatment scales with household size (proxy: Area)." },
+            { id: 4, vendor: "Garbage Removal", amount: 20000, type: "Fixed", logic: "Service provided per doorstep (flat count)." },
+            { id: 5, vendor: "Pest Control", amount: 22000, type: "Fixed", logic: "Uniform coverage of common blocks/basements." },
+            { id: 6, vendor: "BESCOM (Common)", amount: 260000, type: "UDS", logic: "High Court Standard: Share per UDS ownership %." },
+            { id: 7, vendor: "STP Maintenance", amount: 110920, type: "UDS", logic: "Waste load scales with larger unit occupancy." },
+            { id: 8, vendor: "Fire fighting AMC", amount: 35000, type: "UDS", logic: "Safety infrastructure is valued by total area coverage." },
+            { id: 9, vendor: "HK Material", amount: 22430, type: "Fixed", logic: "General operational overheads." }
+        ];
+
+        const TOTAL_PROJECT_AREA = 514443;
+
+        async function callGemini(prompt) {
+            const systemInstruction = "You are a professional Apartment Management Consultant specialized in Bengaluru Real Estate laws and RWA management. Provide concise, strategic, and polite responses.";
+            
+            let retries = 5;
+            let delay = 1000;
+
+            while (retries > 0) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            systemInstruction: { parts: [{ text: systemInstruction }] }
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('API Error');
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+                } catch (err) {
+                    retries--;
+                    if (retries === 0) return "Connection error. Please try again later.";
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        async function generateAIPrompt(type) {
+            openAIModal('loading');
+            let prompt = "";
+            const currentTotal = amcData.reduce((acc, curr) => acc + curr.amount, 0);
+
+            if (type === 'justify_hybrid') {
+                prompt = `The Habitat Eden Heights RWA is proposing a Hybrid Maintenance model. Total Monthly Budget: ${currentTotal}. Fixed portion: 60%, UDS portion: 40%. Write a 3-paragraph letter to residents justifying why Security and Housekeeping are fixed, while Electricity and Water are area-based, citing fairness and legal standards like KAOA.`;
+            } else if (type === 'efficiency_tips') {
+                prompt = `Analyze these AMC costs for a 300-flat apartment in Bangalore: ${JSON.stringify(amcData)}. Suggest 3 specific ways to optimize costs (e.g., solar, STP automation, or bulk vendor contracts) for these specific line items.`;
+            }
+
+            const result = await callGemini(prompt);
+            document.getElementById('aiContent').innerText = result;
+        }
+
+        async function openAIModal(mode) {
+            const modal = document.getElementById('aiModal');
+            const content = document.getElementById('aiContent');
+            modal.classList.remove('hidden');
+            
+            if (mode === 'loading') {
+                content.innerHTML = '<div class="flex flex-col items-center justify-center space-y-4"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div><p>Gemini AI is analyzing your data...</p></div>';
+            } else if (mode === 'analysis') {
+                openAIModal('loading');
+                const prompt = `Perform a strategic analysis of the following maintenance budget: ${JSON.stringify(amcData)}. Evaluate the cost per sft (₹2.81) vs Bengaluru market standards and identify the top 2 risks.`;
+                const result = await callGemini(prompt);
+                content.innerText = result;
+            }
+        }
+
+        function closeAIModal() {
+            document.getElementById('aiModal').classList.add('hidden');
+        }
+
+        function init() {
+            const body = document.getElementById('ledger-body');
+            let fixedSum = 0, udsSum = 0, total = 0;
+
+            amcData.forEach(item => {
+                total += item.amount;
+                if(item.type === "Fixed") fixedSum += item.amount;
+                else udsSum += item.amount;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="text-gray-400 text-xs">${item.id}</td>
+                    <td class="font-semibold text-slate-700">${item.vendor}</td>
+                    <td class="amount-cell text-slate-900">${item.amount.toLocaleString('en-IN')}</td>
+                    <td><span class="${item.type === 'Fixed' ? 'tag-fixed' : 'tag-uds'}">${item.type}</span></td>
+                    <td class="text-[11px] text-gray-500 leading-tight">${item.logic}</td>
+                `;
+                body.appendChild(row);
+            });
+
+            document.getElementById('gross-total').innerText = '₹' + total.toLocaleString('en-IN');
+            document.getElementById('fixed-total').innerText = '₹' + fixedSum.toLocaleString('en-IN');
+            document.getElementById('uds-total').innerText = '₹' + udsSum.toLocaleString('en-IN');
+            document.getElementById('fixed-bar').style.width = ((fixedSum / total) * 100) + '%';
+            document.getElementById('uds-bar').style.width = ((udsSum / total) * 100) + '%';
+        }
+
+        function calculateBill() {
+            const numFlats = parseFloat(document.getElementById('flat-count').value);
+            const mySft = parseFloat(document.getElementById('my-sft').value);
+            let fixedPool = amcData.filter(i => i.type === "Fixed").reduce((a, b) => a + b.amount, 0);
+            let udsPool = amcData.filter(i => i.type === "UDS").reduce((a, b) => a + b.amount, 0);
+
+            const totalDue = (fixedPool / numFlats) + ((udsPool / TOTAL_PROJECT_AREA) * mySft);
+            document.getElementById('result-display').classList.remove('hidden');
+            document.getElementById('final-amount').innerText = '₹' + Math.round(totalDue).toLocaleString('en-IN');
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
