@@ -34,7 +34,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold text-gray-800">Habitat Eden Heights - Comparative Billing Tool</h1>
-                    <p class="text-xs text-gray-500">Proposed Hybrid Maintenance Model: Analysis of Shared vs. Area-Based Costs</p>
+                    <p class="text-xs text-gray-500">Proposed Hybrid Maintenance Model vs. ₹3.25/Sft Standard (Incl. Buffer)</p>
                 </div>
             </div>
             <div class="flex space-x-2">
@@ -96,15 +96,15 @@
                     </svg>
                     <p class="text-[11px] text-blue-800 leading-relaxed">
                         Items tagged as <span class="tag-prorated font-bold text-[9px]">Prorated</span> represent Annual Maintenance Contracts (AMC) or one-time annual payments. 
-                        These values are divided by 12 to show an accurate monthly budget impact and to ensure comparison consistency.
+                        These values are divided by 12 to show an accurate monthly budget impact.
                     </p>
                 </div>
 
                 <!-- Model Comparison Cards -->
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="p-4 bg-white border border-gray-200 rounded-xl">
-                        <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Scenario: 100% SFT</h4>
-                        <p class="text-2xl font-bold text-gray-800">₹3.10 <span class="text-sm font-normal text-gray-500">/ sft</span></p>
+                        <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Scenario: SFT (with Buffer)</h4>
+                        <p class="text-2xl font-bold text-gray-800">₹3.25 <span class="text-sm font-normal text-gray-500">/ sft</span></p>
                     </div>
                     <div class="p-4 bg-white border-2 border-blue-500 rounded-xl shadow-lg relative overflow-hidden">
                         <div class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] px-2 py-1 font-bold rounded-bl-lg">PROPOSED</div>
@@ -135,7 +135,7 @@
                         
                         <div class="pt-4 border-t border-gray-100 space-y-3">
                             <div class="flex justify-between items-center text-gray-500">
-                                <span class="text-xs italic">Pure SFT:</span>
+                                <span class="text-xs italic">SFT @ ₹3.25:</span>
                                 <span class="text-sm font-mono" id="calc-sft">₹0</span>
                             </div>
                             <div class="flex flex-col p-3 bg-blue-600 rounded-lg shadow-inner">
@@ -157,7 +157,7 @@
                         <div id="delta-box" class="mt-4 p-3 rounded-lg text-center">
                             <p class="text-[11px] leading-tight font-medium">
                                 Hybrid is <span id="delta-text">₹0</span> 
-                                <span id="delta-direction">vs. SFT billing</span>.
+                                <span id="delta-direction">vs. ₹3.25 rate</span>.
                             </p>
                         </div>
                     </div>
@@ -192,6 +192,8 @@
 
     <script>
         const TOTAL_PROJECT_AREA = 514443;
+        const DEFAULT_FLATS = 314;
+        const SFT_RATE_WITH_BUFFER = 3.25;
 
         const recurringData = [
             { vendor: "Paradigm (Security/HK)", amount: 773000, type: "Fixed", prorated: false, logic: "Doorstep service / Personnel count independent of size" },
@@ -201,7 +203,7 @@
             { vendor: "Peniel Pest Control", amount: 22000, type: "Fixed", prorated: false, logic: "Uniform coverage" },
             { vendor: "BESCOM (Common)", amount: 260000, type: "UDS", prorated: false, logic: "Pumping / Common Load" },
             { vendor: "STP Maintenance", amount: 110920, type: "UDS", prorated: false, logic: "Load factor" },
-            { vendor: "Fire Fighting AMC", amount: 35000, type: "UDS", prorated: false, logic: "Compliance based on area" },
+            { vendor: "Fire Fighting AMC", amount: 35000, type: "Fixed", prorated: false, logic: "Shared community safety shield" },
             { vendor: "AP Enterprises (HK Mat)", amount: 22430, type: "Fixed", prorated: false, logic: "Shared operations" }
         ];
 
@@ -229,7 +231,7 @@
                 ...nonRecurringData.map(d => ({...d, monthly: Math.round(d.annual/12)}))
             ];
 
-            // Filter Section A (Fixed)
+            // Sort Section A (Fixed)
             allItems.filter(i => i.type === "Fixed").forEach(item => {
                 fixedSum += item.monthly;
                 const row = createRow(item);
@@ -250,8 +252,8 @@
             document.getElementById('fixed-bar').style.width = ((fixedSum/grand)*100)+'%';
             document.getElementById('uds-bar').style.width = ((udsSum/grand)*100)+'%';
             
-            document.getElementById('hybrid-avg').innerText = `₹${Math.round(fixedSum/300).toLocaleString()} + SFT`;
-            document.getElementById('flat-only-val').innerText = `₹${Math.round(grand/300).toLocaleString()}`;
+            document.getElementById('hybrid-avg').innerText = `₹${Math.round(fixedSum/DEFAULT_FLATS).toLocaleString()} + SFT`;
+            document.getElementById('flat-only-val').innerText = `₹${Math.round(grand/DEFAULT_FLATS).toLocaleString()}`;
             
             calculateBill();
         }
@@ -283,7 +285,7 @@
                              nonRecurringData.filter(i=>i.type==="UDS").reduce((a,b)=>a+b.annual,0)/12;
             const totalBudget = totalFixed + totalUds;
 
-            const pureSftBill = (totalBudget / TOTAL_PROJECT_AREA) * mySft;
+            const pureSftBill = SFT_RATE_WITH_BUFFER * mySft;
             const pureFlatBill = totalBudget / flats;
             const hybridFixed = totalFixed / flats;
             const hybridUds = (totalUds / TOTAL_PROJECT_AREA) * mySft;
@@ -303,11 +305,11 @@
             if(diff >= 0) {
                 deltaText.innerText = `₹${diff.toLocaleString()} higher`;
                 deltaBox.className = "mt-4 p-3 rounded-lg text-center bg-orange-50 text-orange-700 border border-orange-100";
-                deltaDir.innerText = "compared to SFT billing";
+                deltaDir.innerText = "compared to ₹3.25/sft rate";
             } else {
                 deltaText.innerText = `₹${Math.abs(diff).toLocaleString()} lower`;
                 deltaBox.className = "mt-4 p-3 rounded-lg text-center bg-green-50 text-green-700 border border-green-100";
-                deltaDir.innerText = "saving compared to SFT billing";
+                deltaDir.innerText = "saving compared to ₹3.25/sft rate";
             }
         }
 
