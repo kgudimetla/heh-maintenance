@@ -15,6 +15,7 @@
         .amount-cell { text-align: right; font-family: 'Courier New', Courier, monospace; font-weight: 600; }
         .tag-fixed { background-color: #e6fffa; color: #2c7a7b; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; border: 1px solid #b2f5ea; }
         .tag-uds { background-color: #fffaf0; color: #9c4221; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; border: 1px solid #feebc8; }
+        .tag-prorated { background-color: #ebf4ff; color: #2b6cb0; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; border: 1px solid #bee3f8; text-transform: uppercase; margin-left: 8px; }
         .summary-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .comparison-row { transition: all 0.2s; border-bottom: 1px solid #f1f5f9; }
         .comparison-row:hover { background-color: #f8fafc; }
@@ -49,10 +50,6 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div class="lg:col-span-3">
-                <div class="section-header py-3 px-4 bg-red-50 border-l-red-600 text-red-900">
-                        New Hybrid Model : Monthly Bill View
-                        <span class="text-[10px] font-normal text-red-700 block normal-case italic mt-0.5">Showing the cross-subsidy effect of a flat ₹3.25/sft rate vs the Hybrid model</span>
-                    </div>
                 <!-- Quick Look Scenario Comparison -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div class="bg-white p-4 rounded-xl border-l-4 border-orange-400 shadow-sm">
@@ -114,7 +111,7 @@
                             <tr class="bg-slate-800 text-white font-bold">
                                 <td class="text-right py-4 uppercase tracking-wider">Total Monthly Project Cost:</td>
                                 <td class="amount-cell text-lg" id="grand-total-val">₹0</td>
-                                <td colspan="2" class="text-xs px-4 italic opacity-80">Includes recurring monthly bills + annualized AMC provisions</td>
+                                <td colspan="2" class="text-xs px-4 italic opacity-80">Recurring monthly bills + annualized AMC provisions</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -203,11 +200,6 @@
                                     <span><strong>Legal Precedent:</strong> Many RWA laws (like KAOA) allow for specific expenses to be split by unit if defined as "Service Charges."</span>
                                 </li>
                             </ul>
-                            <div class="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                                <p class="text-[10px] text-slate-500 italic leading-relaxed">
-                                    <strong>Final Impact:</strong> 3 BHK owners (median) see almost no change. 2.5 BHK owners contribute slightly more to the service base, while 4 BHK owners pay a more accurate reflection of their asset value without overpaying for services.
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -281,29 +273,28 @@
         const DEFAULT_FLATS = 314;
         const SFT_RATE_WITH_BUFFER = 3.25;
 
-        // Structured logic based on principles of Fixed vs UDS
         const recurringData = [
-            { vendor: "Paradigm (Security/HK)", amount: 773000, type: "Fixed", logic: "Doorstep service / Staff presence per block" },
-            { vendor: "Kavi Garden", amount: 50000, type: "Fixed", logic: "Common landscape aesthetic" },
-            { vendor: "Bio-Ren (WTP)", amount: 151630, type: "UDS", logic: "Usage proxy (Pumping/Filtration volume)" },
-            { vendor: "Sri Venkateshwara (Garbage)", amount: 20000, type: "Fixed", logic: "Individual unit collection" },
-            { vendor: "Peniel Pest Control", amount: 22000, type: "Fixed", logic: "Equal common area coverage" },
-            { vendor: "BESCOM (Common)", amount: 260000, type: "UDS", logic: "Linked to common load/pumping" },
-            { vendor: "STP Maintenance", amount: 110920, type: "UDS", logic: "Load based on unit sewage capacity" },
-            { vendor: "Fire Fighting AMC", amount: 35000, type: "Fixed", logic: "Community-wide safety standard" },
-            { vendor: "AP Enterprises (HK Mat)", amount: 22430, type: "Fixed", logic: "Shared operational materials" }
+            { vendor: "Paradigm (Security/HK)", amount: 773000, type: "Fixed", logic: "Doorstep service / Staff presence per block", prorated: false },
+            { vendor: "Kavi Garden", amount: 50000, type: "Fixed", logic: "Common landscape aesthetic", prorated: false },
+            { vendor: "Bio-Ren (WTP)", amount: 151630, type: "UDS", logic: "Usage proxy (Pumping/Filtration volume)", prorated: false },
+            { vendor: "Sri Venkateshwara (Garbage)", amount: 20000, type: "Fixed", logic: "Individual unit collection", prorated: false },
+            { vendor: "Peniel Pest Control", amount: 22000, type: "Fixed", logic: "Equal common area coverage", prorated: false },
+            { vendor: "BESCOM (Common)", amount: 260000, type: "UDS", logic: "Linked to common load/pumping", prorated: false },
+            { vendor: "STP Maintenance", amount: 110920, type: "UDS", logic: "Load based on unit sewage capacity", prorated: false },
+            { vendor: "Fire Fighting AMC", amount: 35000, type: "Fixed", logic: "Community-wide safety standard", prorated: false },
+            { vendor: "AP Enterprises (HK Mat)", amount: 22430, type: "Fixed", logic: "Shared operational materials", prorated: false }
         ];
 
         const nonRecurringData = [
-            { vendor: "Vivish (MyGate)", annual: 58622, type: "Fixed", logic: "Software license per flat" },
-            { vendor: "DGTRONIX (CCTV)", annual: 29000, type: "Fixed", logic: "Common area infrastructure" },
-            { vendor: "Bharth Gruharaksha (Ins.)", annual: 354177, type: "UDS", logic: "Asset value protection (UDS basis)" },
-            { vendor: "Johnson Lifts AMC", annual: 800000, type: "Fixed", logic: "Vertical transit for every household" },
-            { vendor: "Tank/Sump Cleaning", annual: 50000, type: "UDS", logic: "Storage capacity maintenance" },
-            { vendor: "DG AMC", annual: 27500, type: "Fixed", logic: "Service readiness for backup power" },
-            { vendor: "Sanjana Fuel (Diesel)", annual: 180000, type: "UDS", logic: "Power load consumption" },
-            { vendor: "Electrical Inspectorate", annual: 80000, type: "Fixed", logic: "Statutory compliance for common infra" },
-            { vendor: "Misc Repairs", annual: 200000, type: "Fixed", logic: "Daily fixes in shared community spaces" }
+            { vendor: "Vivish (MyGate)", annual: 58622, type: "Fixed", logic: "Software license per flat", prorated: true },
+            { vendor: "DGTRONIX (CCTV)", annual: 29000, type: "Fixed", logic: "Common area infrastructure", prorated: true },
+            { vendor: "Bharth Gruharaksha (Ins.)", annual: 354177, type: "UDS", logic: "Asset value protection (UDS basis)", prorated: true },
+            { vendor: "Johnson Lifts AMC", annual: 800000, type: "Fixed", logic: "Vertical transit for every household", prorated: true },
+            { vendor: "Tank/Sump Cleaning", annual: 50000, type: "UDS", logic: "Storage capacity maintenance", prorated: true },
+            { vendor: "DG AMC", annual: 27500, type: "Fixed", logic: "Service readiness for backup power", prorated: true },
+            { vendor: "Sanjana Fuel (Diesel)", annual: 180000, type: "UDS", logic: "Power load consumption", prorated: true },
+            { vendor: "Electrical Inspectorate", annual: 80000, type: "Fixed", logic: "Statutory compliance for common infra", prorated: true },
+            { vendor: "Misc Repairs", annual: 200000, type: "Fixed", logic: "Daily fixes in shared community spaces", prorated: true }
         ];
 
         function init() {
@@ -318,7 +309,6 @@
                 ...nonRecurringData.map(d => ({...d, monthly: Math.round(d.annual/12)}))
             ];
 
-            // Clear existing rows except headers
             const rows = Array.from(body.querySelectorAll('tr'));
             rows.forEach(row => {
                 if (!row.querySelector('.section-header') && row.id !== 'section-b-marker') {
@@ -351,8 +341,12 @@
         function createRow(item) {
             const tr = document.createElement('tr');
             tr.className = "comparison-row";
+            const proratedTag = item.prorated ? `<span class="tag-prorated">Prorated</span>` : '';
             tr.innerHTML = `
-                <td class="font-medium text-slate-700">${item.vendor}</td>
+                <td class="font-medium text-slate-700 flex items-center">
+                    ${item.vendor}
+                    ${proratedTag}
+                </td>
                 <td class="amount-cell text-slate-900">₹${item.monthly.toLocaleString('en-IN')}</td>
                 <td class="text-center"><span class="${item.type==='Fixed'?'tag-fixed':'tag-uds'}">${item.type}</span></td>
                 <td class="text-[11px] text-gray-500 leading-tight">${item.logic}</td>
@@ -408,7 +402,6 @@
                 document.getElementById(`skew-sft-${ids[i]}`).innerText = sftBill.toLocaleString();
                 document.getElementById(`skew-delta-${ids[i]}`).innerText = delta.toLocaleString();
                 
-                // For the footer insight, use the 4BHK skew
                 if (i === 2) {
                     document.getElementById('footer-skew-val').innerText = delta.toLocaleString();
                 }
